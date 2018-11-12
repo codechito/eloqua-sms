@@ -84,4 +84,3 @@ module.exports = function(emitter){
   return router;
 }
 
-module.exports = router;

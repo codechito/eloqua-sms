@@ -13,5 +13,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use("/assets",express.static(path.join(__dirname, 'public')));
 
+var emitter = require('psharky');
+require('./core/mongo')(emitter);
+var application = require('./routes/application')(emitter);
+
+app.use('/eloqua/lifecycle/', application);
 
 module.exports = app;
