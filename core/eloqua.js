@@ -27,7 +27,6 @@ let execute_api = function(options){
 module.exports = function(emitter){
 
   emitter.registerHook('eloqua::application::enable',function(options){
-         
       return new Promise(function(resolve,reject){
         if(options.install_id && options.redirect_uri && options.client_id){
           let parameters = qs.stringify({
@@ -64,12 +63,17 @@ module.exports = function(emitter){
           };
           let base_url_api = execute_api(base_url_option);
           base_url_api.then(function(base_url_res){
-            let content = {
-              refresh_token: grant_res.refresh_token,
-              access_token: grant_res.access_token,
-              eloqua_base_url: base_url_res.urls.base
-            };
-            resolve(content);
+            if(base_url_res && base_url_res.urls){
+              let content = {
+                refresh_token: grant_res.refresh_token,
+                access_token: grant_res.access_token,
+                eloqua_base_url: base_url_res.urls.base
+              };
+              resolve(content);
+            }
+            else{
+              reject(base_url_res);
+            }
           },function(err){
             reject(err);
           });
