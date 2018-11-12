@@ -3,7 +3,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const Schema = mongoose.Schema;
 const config = require("config");
 
-const ConsumerSchema = {
+const ConsumerModel = {
   "InstallId": { type: String, required: true },
   "CallbackUrl": { type: String, required: true },
   "UserId": { type: String, required: true },
@@ -19,8 +19,8 @@ const ConsumerSchema = {
 };
 
 let connection = mongoose.createConnection(config.mongodburl,{useNewUrlParser: true});
-
-let consumer = connection.model('Consumer',new Schema(ConsumerSchema,{collection: 'Campaign',versionKey: false}));
+let ConsumerSchema = new Schema(ConsumerModel,{collection: 'Consumer',versionKey: false});
+let consumer = connection.model('Consumer',ConsumerSchema);
 
 let db = {
   Consumer: consumer
@@ -32,12 +32,15 @@ module.exports = function(emitter){
          
     return new Promise(function(resolve,reject){
       if(db[options.table]){
-        db[options.table].findOneAndUpdate(options.condition, options.content, {new: true, upsert: true},function(err,result){
+        db[options.table].findOneAndUpdate(options.condition, options.content, {new: true, upsert: true, rawResult: true},function(err,result){
           if(err){
             reject(err);
           }
           if(result){
-            resolve(result);
+            let content = JSON.parse(JSON.stringify(result));
+            let mContent = content.value;
+            mContent.updatedExisting = content.lastErrorObject.updatedExisting;
+            resolve(mContent);
           }
         });
       }
@@ -45,7 +48,6 @@ module.exports = function(emitter){
         reject("TABLE_NOT_FOUND");
       }
     });
-
   });
   emitter.registerHook('db::create',function(options){
          
