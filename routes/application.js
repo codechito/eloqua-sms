@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const config = require('config');
 const mongoose = require('mongoose');
+const countries = require('country-data').countries;
 
 module.exports = function(emitter){
   
@@ -88,9 +89,37 @@ module.exports = function(emitter){
     
   });
   
-  router.get('/configure/:InstallId', mdlware.verify, function(req, res){
+  router.all('/configure/:InstallId', mdlware.verify, function(req, res){
     
-    res.render('application');
+    let consumer = emitter.invokeHook('db::findOne', { InstallId: req.params.InstallId });        
+    consumer.then(function(consumer_res){
+      if(req.body.transmitsms_api_key){
+        let queryOption = {
+          table: 'Consumer',
+          condition: { InstallId: req.params.InstallId },
+          content: {
+            transmitsms_api_key: req.body.transmitsms_api_key,
+            transmitsms_api_secret: req.body.transmitsms_api_secret,
+            default_country: req.body.default_country,
+            DateConfigured: Date.now()
+          }
+        };
+        let updateOne = emitter.invokeHook('db::updateOne', queryOption);        
+        updateOne.then(function(updateOne_res){
+          updateOne_res.message = "Account successfully updated";
+          updateOne_res.countries = countries;
+          res.render('application',consumer_res);
+        },function(err){
+          res.status(400).json(err);
+        });
+      }
+      else{
+        consumer_res.countries = countries;
+        res.render('application',consumer_res);
+      }     
+    },function(err){
+        res.status(400).json(err);
+    });   
     
   });
   
