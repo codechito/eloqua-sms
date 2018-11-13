@@ -91,7 +91,7 @@ module.exports = function(emitter){
   
   router.all('/configure/:InstallId', mdlware.verify, function(req, res){
     
-    let consumer = emitter.invokeHook('db::findOne', { InstallId: req.params.InstallId });        
+    let consumer = emitter.invokeHook('db::findOne', { table:'Consumer', condition: { InstallId: req.params.InstallId }});        
     consumer.then(function(consumer_res){
       if(req.body.transmitsms_api_key){
         let queryOption = {
@@ -104,18 +104,18 @@ module.exports = function(emitter){
             DateConfigured: Date.now()
           }
         };
-        let updateOne = emitter.invokeHook('db::updateOne', queryOption);        
-        updateOne.then(function(updateOne_res){
-          updateOne_res.message = "Account successfully updated";
-          updateOne_res.countries = countries;
-          res.render('application',consumer_res);
+        let upsert = emitter.invokeHook('db::upsert', queryOption);        
+        upsert.then(function(upsert_res){
+          upsert_res[0].message = "Account successfully updated";
+          upsert_res[0].countries = countries;
+          res.render('application',upsert_res[0]);
         },function(err){
           res.status(400).json(err);
         });
       }
       else{
-        consumer_res.countries = countries;
-        res.render('application',consumer_res);
+        consumer_res[0].countries = countries;
+        res.render('application',consumer_res[0]);
       }     
     },function(err){
         res.status(400).json(err);
