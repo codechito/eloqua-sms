@@ -13,9 +13,11 @@ const ConsumerModel = {
   "refresh_token": { type: String },
   "access_token": { type: String },
   "eloqua_base_url": { type: String },
-  "DateEnabled": { type: Date, default: Date.now },
+  "LastLogin": { type: Date },
+  "DateEnabled": { type: Date },
   "DateDisabled": { type: Date },
-  "status": { type: Boolean, default: true }
+  "DateConfigured": { type: Date },
+  "status": { type: String, default: 'enabled' }
 };
 
 let connection = mongoose.createConnection(config.mongodburl,{useNewUrlParser: true});
@@ -27,7 +29,9 @@ let db = {
 };
 
 module.exports = function(emitter){
-
+  
+  emitter._dbConnection = connection;
+  
   emitter.registerHook('db::upsert',function(options){
          
     return new Promise(function(resolve,reject){
@@ -49,6 +53,7 @@ module.exports = function(emitter){
       }
     });
   });
+  
   emitter.registerHook('db::create',function(options){
          
     return new Promise(function(resolve,reject){
@@ -193,4 +198,5 @@ module.exports = function(emitter){
     });
 
   });
+  
 };
