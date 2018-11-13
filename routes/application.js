@@ -91,7 +91,6 @@ module.exports = function(emitter){
   
   router.all('/configure/:InstallId', mdlware.verify, function(req, res){
     
-    
     let consumer = emitter.invokeHook('db::findOne', { table:'Consumer', condition: { InstallId: req.params.InstallId }});        
     consumer.then(function(consumer_res){
       if(req.body.transmitsms_api_key){
