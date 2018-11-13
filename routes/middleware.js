@@ -20,7 +20,7 @@ module.exports = function(emitter){
       };
       let verify = emitter.invokeHook('eloqua::request::verify',verify_options);
       verify.then(function(verify_res){
-        if(verify_res[0]){
+        if(verify_res[0].status){
           next();
         }
         else{
@@ -29,9 +29,6 @@ module.exports = function(emitter){
       },function(err){
         res.status(400).json(err);
       });
-
-      next();
-
     },
     notify: function(req, res, next){   
       

@@ -128,11 +128,12 @@ module.exports = function(emitter){
     
     return new Promise(function(resolve,reject){
       if(options.originalUrl && options.method && options.client_id && options.client_secret){
-        let request = parse_url(options.originalUrl, options.method);
-        let signature = request.query.oauth_signature;
-        delete request.query.oauth_signature;
-        let generated = sign_request(request.query, request, options.client_secret);
-        resolve(options.client_id === request.query.oauth_consumer_key && generated === signature);
+          let request = parse_url(options.originalUrl, options.method);       
+          let signature = request.query.oauth_signature;
+          delete request.query.oauth_signature;
+          let generated = sign_request(request.query, request, options.client_secret);
+          let status  = options.client_id === request.query.oauth_consumer_key && generated === signature;
+          resolve({status:status});
       }
       else{
         reject("Missing one of these required parameters: originalUrl, method, client_id, client_secret");
