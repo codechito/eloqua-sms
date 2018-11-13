@@ -1,1 +1,69 @@
-hello
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>TransmitSMS Configure Application Page</title>
+
+    <link href="/assets/stylesheets/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/stylesheets/main.css" rel="stylesheet">
+  </head>
+  <body>
+  <div class="disabler"></div>
+  <div class="container" style="width: 450px;">
+      <center>
+      <form method = "post">
+        <br/> <br/><br/><br/>
+        <img src="/assets/images/eloqua-connect_thumb.png" alt="Connect to Burst SMS">
+        <br/>
+        <br/>
+        <h4 class="title">
+          Connect Eloqua to your Burst SMS Account
+        </h4>
+        <br/><br/><br/>
+        <% if (locals.message) { %>
+            <div class="alert alert-success alert-dismissible fade in" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <%= message %>
+            </div>
+        <% } %>
+        <div class="form-group">
+            <label for="transmitsms_api_key" style="width:500px; text-align:left;">Burst SMS API Key</label>
+            <input type = "text" class="form-control" name = "transmitsms_api_key" id = "transmitsms_api_key" value="<%= locals.transmitsms_api_key %>"></input>
+        </div>
+        <div class="form-group">
+            <label for="transmitsms_api_secret" style="width:500px; text-align:left;">Burst SMS API Secret</label>
+            <input type = "text" class="form-control" name = "transmitsms_api_secret" id = "transmitsms_api_secret" value="<%= locals.transmitsms_api_secret %>"></input>
+        </div>
+        <div class="form-group">
+          <label for="default_country" style="width:500px; text-align:left;">Default Country for Number Formatting</label>
+          <select name = "default_country" id = "default_country" class="form-control">
+          <%  var options = {}; %>
+          <% for (var key in countries) { %>
+              <% if( !options[countries[key].name]){ %>
+                  <% options[countries[key].name] = countries[key].name; %>
+                  <option value = "<%= countries[key].name %>" <% if(locals.default_country == countries[key].name){ %> selected="selected" <% } %> >
+                  <%= countries[key].name %>
+                  </option>
+              <% } %>
+          <% } %>
+          </select>
+          <p style="width:500px; text-align:left; font-size:11px;"><i>Number will be formatted for delivery to this country if contact has no country defined.</i></p>
+        </div>
+        <button id="btnSave" type="submit" class="btn btn-default">Connect</button>
+        <br/><br/>
+        <p>Your Burst SMS API Key and secret can be found here: <a target="_blank" href="http://burst.transmitsms.com/profile">http://burst.transmitsms.com/profile</a></p>
+        <p>No Account? Register here: <a target="_blank" href="http://go.burstsms.com">http://go.burstsms.com</a></p>
+      </form>
+      </center>
+    </div>
+    <script src="/assets/javascripts/jquery.js"></script>
+    <script src="/assets/javascripts/autosize.min.js"></script>
+    <script src="/assets/javascripts/bootstrap.min.js"></script>
+  </div>
+  </body>
+</html>

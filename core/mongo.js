@@ -17,6 +17,9 @@ const ConsumerModel = {
   "DateEnabled": { type: Date },
   "DateDisabled": { type: Date },
   "DateConfigured": { type: Date },
+  "transmitsms_api_key": { type: String },
+  "transmitsms_api_secret": { type: String },
+  "default_country": { type: String },
   "status": { type: String, default: 'enabled' }
 };
 
@@ -99,14 +102,12 @@ module.exports = function(emitter){
 
   });
 
-  emitter.registerHook('db::update',function(options){
+  emitter.registerHook('db::updateOne',function(options){
          
     return new Promise(function(resolve,reject){
       if(db[options.table]){
-        let item = JSON.parse(JSON.stringify(options.content));
-        delete item._id;
         db[options.table]
-          .updateOne({"_id" : ObjectId(options.content._id)},{$set:item},{multi: true},function(err,result){
+          .updateOne(options.condition,options.content,{multi: true},function(err,result){
             if(err){
               reject(err);
             }

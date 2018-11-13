@@ -7,19 +7,20 @@
   },
   "dependencies": {
     "config": "^2.0.1",
+    "connect-mongo": "2.0.1",
     "cookie-parser": "~1.4.3",
+    "country-data": "0.0.31",
     "debug": "~2.6.9",
     "ejs": "~2.5.7",
     "express": "~4.16.0",
+    "express-session": "^1.15.1",
     "http-errors": "~1.6.2",
     "mongoose": "^5.3.11",
     "morgan": "~1.9.0",
     "psharky": "0.0.0",
     "querystring": "^0.2.0",
     "request": "^2.88.0",
-    "url": "^0.11.0",
     "slack-node": "^0.1.8",
-    "express-session": "^1.15.1",
-    "connect-mongo": "2.0.1"
+    "url": "^0.11.0"
   }
 }

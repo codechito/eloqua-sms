@@ -1,0 +1,24 @@
+body.loading .disabler {
+	position: fixed;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 2;
+	background: url("/assets/images/loader.gif") #ccc center center no-repeat;
+	opacity: 0.8;
+}
+
+.alert {
+	padding: 5px 35px 5px;
+	text-align: center;
+}
+
+.center-block {
+	float: none;
+}
+
+h4.title {
+	font-size: 20px; 
+	font-weight: bold; 
+	text-align: center;
+}
