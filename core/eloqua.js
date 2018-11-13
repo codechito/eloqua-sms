@@ -51,8 +51,7 @@ const sign_request = function(params, request, client_secret){
 
   let base = encodeURIComponent(request.method).replace(/!/g, '%21') + '&' +
   encodeURIComponent(request.baseUrl).replace(/!/g, '%21') + '&' + 
-  encodeURIComponent(request.baseUrl).replace(/!/g, '%21') + '&' + 
-  encodeURIComponent(queryfy(params)).replace(/!/g, '%21')
+  encodeURIComponent(queryfy(params)).replace(/!/g, '%21');
   
   let signingKey = encodeURIComponent(client_secret).replace(/!/g, '%21') + '&';
   let signature = crypto.createHmac('sha1', signingKey).update(base).digest('base64');
@@ -128,11 +127,13 @@ module.exports = function(emitter){
     
     return new Promise(function(resolve,reject){
       if(options.originalUrl && options.method && options.client_id && options.client_secret){
-        let request = parse_url(options.originalUrl, options.method);
-        let signature = request.query.oauth_signature;
-        delete request.query.oauth_signature;
-        let generated = sign_request(request.query, request, options.client_secret);
-        resolve(options.client_id === request.query.oauth_consumer_key && generated === signature);
+          let request = parse_url(options.originalUrl, options.method);       
+          let signature = request.query.oauth_signature;
+          delete request.query.oauth_signature;
+          let generated = sign_request(request.query, request, options.client_secret);
+        console.log(options.client_id === request.query.oauth_consumer_key, generated === signature);
+          let status  = options.client_id === request.query.oauth_consumer_key && generated === signature;
+          resolve({status:status});
       }
       else{
         reject("Missing one of these required parameters: originalUrl, method, client_id, client_secret");

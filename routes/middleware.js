@@ -20,7 +20,7 @@ module.exports = function(emitter){
       };
       let verify = emitter.invokeHook('eloqua::request::verify',verify_options);
       verify.then(function(verify_res){
-        if(verify_res[0]){
+        if(verify_res[0].status){
           next();
         }
         else{
@@ -29,13 +29,10 @@ module.exports = function(emitter){
       },function(err){
         res.status(400).json(err);
       });
-
-      next();
-
     },
     notify: function(req, res, next){   
       
-      if(req.notify && req.session.consumer){
+      if(req.notify){
         let color = "";
         let priority = "";
         switch(req.notify.signal){
@@ -45,14 +42,14 @@ module.exports = function(emitter){
         };
         var attachments = [];
         attachments.push({
-          "color": color, "pretext": req.session.consumer.SiteName,
-          "author_name": req.session.consumer.UserName , "title": req.notify.title,
+          "color": color, "pretext": req.notify.consumer.SiteName,
+          "author_name": req.notify.consumer.UserName , "title": req.notify.title,
           "text": req.notify.text, "fields": req.notify.fields,
           "footer": "TechnologyPartnerBurstSMS", "ts":  Date.now()/1000
         });
         slack.webhook({
           channel: "integrated-apps", username: "Sharky",
-          text: req.notify.text, attachments: attachments
+          text: "Activity Details", attachments: attachments
         },function(){
           next();
         });
