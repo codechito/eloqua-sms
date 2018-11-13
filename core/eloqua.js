@@ -1,11 +1,13 @@
 const qs = require('querystring');
 const request = require('request');
+const url = require('url');
+const crypto = require('crypto');
 
 let authorize_url = 'https://login.eloqua.com/auth/oauth2/authorize';
 let token_url = 'https://login.eloqua.com/auth/oauth2/token';
 let base_url = 'https://login.eloqua.com/id';
 
-let execute_api = function(options){
+const execute_api = function(options){
   return new Promise(function(resolve,reject){
     request({
       method: options.method,
@@ -23,6 +25,35 @@ let execute_api = function(options){
     })
   });
 };
+
+const parse_url = function(uri,method){
+  let parsed = url.parse(uri, true);
+  parsed.baseUrl = parsed.protocol + '//' + parsed.host + parsed.pathname;
+  parsed.method = method.toUpperCase();
+  return parsed;
+}
+
+const queryfy = function(params){
+  let array = [];
+  for (var prop in params) {
+      array.push(prop + '=' + params[prop]);
+  }
+  let encoded = array.sort().join('&');
+  return encoded;
+}
+
+const sign_request = function(params, request, client_secret){
+
+  let base = encodeURIComponent(request.method).replace(/!/g, '%21') + '&' +
+  encodeURIComponent(request.baseUrl).replace(/!/g, '%21') + '&' + 
+  encodeURIComponent(request.baseUrl).replace(/!/g, '%21') + '&' + 
+  encodeURIComponent(queryfy(params)).replace(/!/g, '%21')
+  
+  let signingKey = encodeURIComponent(client_secret).replace(/!/g, '%21') + '&';
+  let signature = crypto.createHmac('sha1', signingKey).update(base).digest('base64');
+
+  return signature;
+}
 
 module.exports = function(emitter){
 
@@ -83,6 +114,23 @@ module.exports = function(emitter){
       }
       else{
         reject("Missing one of these required parameters: client_id, client_secret, authorization_code, redirect_uri");
+      }
+    });
+
+  });
+
+  emitter.registerHook('eloqua::request::verify',function(options){
+    
+    return new Promise(function(resolve,reject){
+      if(options.originalUrl && options.method && options.client_id && options.client_secret){
+        let request = parse_url(options.originalUrl, options.method);
+        let signature = request.query.oauth_signature;
+        delete request.query.oauth_signature;
+        let generated = sign_request(request.query, request, options.client_secret);
+        resolve(options.client_id === request.query.oauth_consumer_key && generated === signature);
+      }
+      else{
+        reject("Missing one of these required parameters: originalUrl, method, client_id, client_secret");
       }
     });
 

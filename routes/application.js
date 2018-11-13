@@ -1,6 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var config = require('config');
+const express = require('express');
+const router = express.Router();
+const config = require('config');
+const mongoose = require('mongoose');
 
 module.exports = function(emitter){
 
@@ -51,11 +52,12 @@ module.exports = function(emitter){
       };
       let enable_uri = emitter.invokeHook('eloqua::application::enable::callback',callback_option);
       enable_uri.then(function(enable_uri_res){
+        let token = enable_uri_res[0];
         let consumer = {
           InstallId: req.params.InstallId,
-          refresh_token: enable_uri_res.refresh_token,
-          access_token: enable_uri_res.access_token,
-          eloqua_base_url: enable_uri_res.eloqua_base_url
+          refresh_token: token.refresh_token,
+          access_token: token.access_token,
+          eloqua_base_url: token.eloqua_base_url
         };
         let queryOption = {
           table: 'Consumer',
@@ -78,8 +80,29 @@ module.exports = function(emitter){
     }
   });
 
-  router.post('/configure', function(req, res){
+  router.use('/configure', function(req, res, next){
+    let verify_options = {
+      "originalUrl": config.get('domain') + req.originalUrl,           	                        
+      "method" : req.method,
+      "client_id" : config.client_id,
+      "client_secret" : config.client_secret
+    };
+    let verify = emitter.invokeHook('eloqua::request::verify',verify_options);
+    verify.then(function(verify_res){
+      if(verify_res[0]){
+        next();
+      }
+      else{
+        res.status(400).json("Oauth Verification failed");
+      }
+      
+    },function(err){
+      res.status(400).json(err);
+    });
 
+    next();
+  }).get('/configure', function(req, res){
+    res.render('application');
   });
 
   router.post('/disable', function(req, res){
@@ -88,6 +111,10 @@ module.exports = function(emitter){
 
   router.post('/status', function(req, res){
 
+    res.status(200).json({
+      database: mongoose.connection.readyState ? "Up" : "Down"
+    });
+    
   });
 
   return router;
