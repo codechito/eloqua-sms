@@ -20,7 +20,12 @@ const execute_api = function(options){
       }
       else{
         let result = res ? res.body : body;
-        resolve(result);
+        if(result.error){
+          reject(result);
+        }
+        else{
+          resolve(result);  
+        }
       }
     })
   });

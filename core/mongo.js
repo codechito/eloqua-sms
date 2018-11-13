@@ -13,9 +13,11 @@ const ConsumerModel = {
   "refresh_token": { type: String },
   "access_token": { type: String },
   "eloqua_base_url": { type: String },
-  "DateEnabled": { type: Date, default: Date.now },
+  "LastLogin": { type: Date },
+  "DateEnabled": { type: Date },
   "DateDisabled": { type: Date },
-  "status": { type: Boolean, default: true }
+  "DateConfigured": { type: Date },
+  "status": { type: String, default: 'enabled' }
 };
 
 let connection = mongoose.createConnection(config.mongodburl,{useNewUrlParser: true});
@@ -27,7 +29,9 @@ let db = {
 };
 
 module.exports = function(emitter){
-
+  
+  emitter._dbConnection = connection;
+  
   emitter.registerHook('db::upsert',function(options){
          
     return new Promise(function(resolve,reject){
@@ -49,6 +53,7 @@ module.exports = function(emitter){
       }
     });
   });
+  
   emitter.registerHook('db::create',function(options){
          
     return new Promise(function(resolve,reject){
@@ -69,15 +74,12 @@ module.exports = function(emitter){
 
   });
 
-  emitter.registerHook('db::find',function(options){
+  emitter.registerHook('db::findOne',function(options){
          
     return new Promise(function(resolve,reject){
       if(db[options.table]){
-        if(options.content._id){
-          options.content._id = ObjectId(options.content._id);
-        }
         db[options.table]
-          .find(options.content)
+          .findOne(options.condition)
           .skip(options.skip || 0)
           .limit(options.limit || 100)
           .sort(options.sort || {})
@@ -193,4 +195,5 @@ module.exports = function(emitter){
     });
 
   });
+  
 };

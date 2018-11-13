@@ -15,6 +15,7 @@ app.use("/assets",express.static(path.join(__dirname, 'public')));
 let emitter = require('psharky');
 require('./core/mongo')(emitter);
 require('./core/eloqua')(emitter);
+
 let application = require('./routes/application')(emitter);
 
 app.use('/eloqua/lifecycle/', application);
