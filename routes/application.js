@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 
 module.exports = function(emitter){
   
+  const mdlware = require('./middleware')(emitter);
+  
   router.post('/enable', function(req, res){
     
     let redirect_uri = config.serverurl + '/eloqua/lifecycle/callback/' + req.query.InstallId;
@@ -70,8 +72,7 @@ module.exports = function(emitter){
           condition: { InstallId: req.params.InstallId },
           content: consumer
         };
-        let upsert = emitter.invokeHook('db::upsert', queryOption);
-        
+        let upsert = emitter.invokeHook('db::upsert', queryOption);        
         upsert.then(function(upsert_res){
           res.redirect(upsert_res[0].CallbackUrl);
         },function(err){
@@ -87,35 +88,13 @@ module.exports = function(emitter){
     
   });
   
-  router.use(function(req, res, next){
-    
-    console.log(req.method, req.originalUrl);
-    let verify_options = {
-      "originalUrl": config.serverurl + req.originalUrl,           	                        
-      "method" : req.method,
-      "client_id" : config.client_id,
-      "client_secret" : config.client_secret
-    };
-    let verify = emitter.invokeHook('eloqua::request::verify',verify_options);
-    verify.then(function(verify_res){
-      if(verify_res[0]){
-        next();
-      }
-      else{
-        res.status(400).json("Oauth Verification failed");
-      }
-      
-    },function(err){
-      res.status(400).json(err);
-    });
-
-    next();
-    
-  }).get('/configure/:InstallId', function(req, res){
+  router.get('/configure/:InstallId', mdlware.verify, function(req, res){
     
     res.render('application');
     
-  }).post('/disable/:InstallId', function(req, res){ 
+  });
+  
+  router.post('/disable/:InstallId', mdlware.verify, function(req, res){ 
     
     let queryOption = {
       table: 'Consumer',
@@ -133,11 +112,15 @@ module.exports = function(emitter){
       res.status(400).json(err);
     });
 
-  }).get('/status', function(req, res){
+  });
     
-    res.status(200).json({
-      database: mongoose.connection.readyState ? "Up" : "Down"
-    });
+  router.get('/status/:InstallId', mdlware.verify, function(req, res){
+    
+    if(req.params.InstallId){
+      res.status(200).json({
+        database: mongoose.connection.readyState ? "Up" : "Down"
+      });
+    } 
     
   });
 

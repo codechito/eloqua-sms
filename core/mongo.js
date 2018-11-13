@@ -74,15 +74,12 @@ module.exports = function(emitter){
 
   });
 
-  emitter.registerHook('db::find',function(options){
+  emitter.registerHook('db::findOne',function(options){
          
     return new Promise(function(resolve,reject){
       if(db[options.table]){
-        if(options.content._id){
-          options.content._id = ObjectId(options.content._id);
-        }
         db[options.table]
-          .find(options.content)
+          .findOne(options.condition)
           .skip(options.skip || 0)
           .limit(options.limit || 100)
           .sort(options.sort || {})
