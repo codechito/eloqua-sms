@@ -12,7 +12,7 @@
     "country-data": "0.0.31",
     "debug": "~2.6.9",
     "ejs": "~2.5.7",
-    "eloquafy": "0.2.0",
+    "eloquafy": "0.3.0",
     "express": "~4.16.0",
     "express-session": "^1.15.1",
     "http-errors": "~1.6.2",

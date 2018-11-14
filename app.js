@@ -20,6 +20,6 @@ let application = require('./routes/application')(emitter);
 let instance = require('./routes/instance')(emitter);
 
 app.use('/eloqua/lifecycle/', application);
-app.use('/eloqua/lifecycle/', instance);
+app.use('/eloqua/', instance);
 
 module.exports = app;
