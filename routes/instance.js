@@ -6,7 +6,7 @@ const config = require('config');
 module.exports = function(emitter){
   
   const mdlware = require('./middleware')(emitter);
-  
+
   router.use(function(req,res,next){
     console.log(req.originalUrl);
     console.log(req.body);
