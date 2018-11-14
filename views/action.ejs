@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Configure Action Service</title>
+
+    <link href="/assets/stylesheets/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/stylesheets/jquery-ui.css">
+    <link href="/assets/stylesheets/main.css" rel="stylesheet">
+    <style type="text/css">
+        #merge-fields-list li:hover {background-color: #bdf;}
+        .ui-widget {
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+          font-size: 12px;
+          padding: 0px;
+        }
+        .ui-widget #dialog {
+          padding: 10px 0px;
+        }
+        .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+          font-size: 12px;
+        }
+        .ui-dialog .ui-dialog-titlebar-close {
+          background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANBJREFUeNpiYKAQMMMYrq6uCcrKyv1AfPHevXsvsCkGqjEAyi8HYkagmgsgMUaYZiA1H6ruAxA77t69+wK6ZiC1H4gFoEKJQDULmKCceCS1IAX7oRpwaYbrYYFyCtEUwAxxhPLRNX+A6oF4AY8tH5AMZMDmRUYC/kQHGOHDiC2kcRiCNXCZKE0H1PMCRYGIRzO+aAQbAguDflwKoDY5IrkG5qJ+5EBciM+fOAxZCM9MoIwBzCAPoSZHokcVVM0LoJqdQKYGEDeC8gEDNQBAgAEARFVtDaumXRoAAAAASUVORK5CYII=");
+          background-color: transparent;
+          border: 0px;
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+        button.ui-dialog-titlebar-close:focus {
+          outline: none;
+        }
+    </style>
+  </head>
+  <body>
+  <div class="disabler"></div>
+  <div class="container" style="width: 600px;">
+      <form method = "post">
+        <h4 style="font-size: 20px; font-weight: bold; text-align: center;">
+          <img src="/assets/images/send-sms-el-icon.png">&nbsp;Create your Text Message
+        </h4>
+        <br/>
+        <% if (status && status.success) { %>
+            <div class="alert alert-success alert-dismissible fade in" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <%= status.success %>
+            </div>
+        <% } %>
+        <% if (status && status.error) { %>
+          <div class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <%= status.error %>
+          </div>
+        <% } %>
+      <div class="container-fluid">
+      <div class="row">
+              <div class="col-md-6" style="display: inline-block;width: 240px;vertical-align: top;margin-left: -10px;">
+                  <div class="form-group">
+                      <label for="message" >Sender ID</label><br>
+                      <select name = "caller_id" id = "caller_id" style="width: 200px; height: 35px;" class="form-control">
+                         <option value = "" >Default</option>
+                         <% for(var i=0; i < locals.sender_ids["Virtual Number"].length; i++) { %>
+                            <option value = "<%= locals.sender_ids["Virtual Number"][i] %>" <% if(locals.caller_id == locals.sender_ids["Virtual Number"][i]){ %> selected="selected" <% } %> >
+                            <%= locals.sender_ids["Virtual Number"][i] %>
+                         </option>
+                        <% } %>
+                        <% for(var i=0; i < locals.sender_ids["Business Name"].length; i++) { %>
+                           <option value = "<%= locals.sender_ids["Business Name"][i] %>" <% if(locals.caller_id == locals.sender_ids["Business Name"][i]){ %> selected="selected" <% } %> >
+                           <%= locals.sender_ids["Business Name"][i] %>
+                        </option>
+                        <% } %>
+                     </select>
+                   </div>
+               </div>
+              <div class="col-md-6" style="width: 240px;float: right;margin-right: -15px;">
+                    <div class="form-group">
+                      <label for="message" >Recipient Field</label><br/>
+                      <input type="text" class="form-control" style="width:140px; display:inline;" id="recipient_field" name="recipient_field" value="<%= locals.recipient_field %>"/>
+                      <button type="button" class="btn btn-default" style="float: right; font-size: 12px; height:35px;"id="recipientFieldList">Choose</button><br/>
+                   </div>
+              </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6" style="display: inline-block;width: 240px;vertical-align: top;margin-left: -10px;">
+          <div class="form-group">
+              <label for="message" >AutoFormat Mobile Number</label><br>
+              <select name = "country_setting" id = "country_setting" style="width: 200px; height: 35px;" class="form-control">
+                 <option value = "cc" <% if(locals.country_setting == "cc" ){ %> selected="selected" <% } %> >Contact Country </option>
+                 <option value = "cf" <% if(locals.country_setting == "cf" ){ %> selected="selected" <% } %> >Custom Field </option>
+             </select>
+           </div>
+       </div>
+      <div class="col-md-6" style="width: 240px;float: right;margin-right: -15px;">
+            <div class="form-group">
+              <label for="message" >Country Field</label><br/>
+              <input type="text" class="form-control" style="width:140px; display:inline;" id="country_field" name="country_field" value="<%= locals.country_field %>"/>
+              <button type="button" class="btn btn-default" style="float: right; font-size: 12px; height:35px;"id="countryFieldList">Choose</button><br/>
+           </div>
+      </div>
+</div>
+		<div class="row">
+		    <div class="col-md-6" style="display: inline-block;width: 240px;vertical-align: top;margin-left: -10px;">
+            <div class="form-group">
+                <label for="message" >Custom Objects</label><br>
+                <select name = "custom_object_id" id = "custom_object_id" style="width: 200px; height: 35px;" class="form-control">
+                     <% if (locals.custom_objects && locals.custom_objects.elements && locals.custom_objects.elements.length){ %>
+                      <option value = "" >None</option>
+                      <% for(var i=0; i < locals.custom_objects.elements.length; i++) { %>
+                          <option value = "<%= locals.custom_objects.elements[i].id %>" <% if(locals.custom_object_id == locals.custom_objects.elements[i].id ){ %> selected="selected" <% } %> >
+                          <%= locals.custom_objects.elements[i].name %>
+                      </option>
+                      <% } %>
+                  <% } %>
+               </select>
+             </div>  
+	  	   </div>
+	      <div class="col-md-6" style="width: 240px;float: right;margin-right: -15px;">      
+            <div class="form-group">
+                <label for="message" >Map Notification To</label><br/>
+                <input type="text"  style="width:140px; display:inline;" class="form-control" id="notification_field" name="notification_field" value="<%= locals.notification_field %>"/>
+                <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;"id="notificationFieldList">Choose</button><br/>
+            </div>
+	      </div>
+    </div>
+    <div class="row">
+		    <div class="col-md-6" style="display: inline-block;width: 240px;vertical-align: top;margin-left: -10px;">
+            <div class="form-group">
+                <label for="message" >Map Contact Mobile To </label><br/>
+                <input type="text"  style="width:140px; display:inline;" class="form-control" id="mobile_field" name="mobile_field" value="<%= locals.mobile_field %>"/>
+                <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;"id="mobileFieldList">Choose</button><br/>
+            </div>
+	  	   </div>
+	      <div class="col-md-6" style="width: 240px;float: right;margin-right: -15px;">
+            <div class="form-group">
+                <label for="message" >Map Contact Email To </label><br/>
+                <input type="text"  style="width:140px; display:inline;" class="form-control" id="email_field" name="email_field" value="<%= locals.email_field %>"/>
+                <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;"id="emailFieldList">Choose</button><br/>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+		    <div class="col-md-6" style="display: inline-block;width: 240px;vertical-align: top;margin-left: -10px;">
+            <div class="form-group">
+                <label for="message" >Map Campaign Title To </label><br/>
+                <input type="text"  style="width:140px; display:inline;" class="form-control" id="title_field" name="title_field" value="<%= locals.title_field %>"/>
+                <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;"id="titleFieldList">Choose</button><br/>
+            </div>
+	  	   </div>
+	      <div class="col-md-6" style="width: 240px;float: right;margin-right: -15px;">
+	      </div>
+		</div>
+		</div>
+        <div class="form-group">
+            <label for="message" >Message</label>
+            <button type="button" class="btn btn-default" style="float: right; margin-bottom: 10px; font-size: 11px;"id="fieldMerger">Merge</button>
+            <textarea style="height: 200px;" class="form-control" name = "message" id = "message"><%= locals.message %></textarea>
+        </div>
+        <button id="btnSave" type="submit" class="btn btn-default" style="margin: 0 auto; display: block;">SAVE</button>
+        <br/><br/>
+      </form>
+    </div>
+    <script src="/assets/javascripts/jquery.js"></script>
+    <script src="/assets/javascripts/jquery-ui.js"></script>
+    <script src="/assets/javascripts/autosize.min.js"></script>
+    <script src="/assets/javascripts/bootstrap.min.js"></script>
+  </div>
+
+  <div id="dialog" title="Contact Fields">
+        <div>
+        <% if(locals.merge_fields && locals.merge_fields.length) { %>
+          <ul id="merge-fields-list" style="overflow:scroll; height:300px; margin-bottom: 0px; border-bottom: 1px solid #c5c5c5;">
+            <% for(var i=0; i < locals.merge_fields.length; i++) { %>
+              <li data-name="<%= locals.merge_fields[i].name %>"
+                  data-dataType="<%= locals.merge_fields[i].dataType %>"
+                  data-internalName="<%= locals.merge_fields[i].internalName %>"
+                  style="display: block; cursor: pointer;"
+              ><%= locals.merge_fields[i].name %></li>
+            <% } %>
+          </ul>
+          <% } %>
+          <div style="width: 100%; padding: 5px;">
+            <input type="text" id="field-search" placeholder="Search" style="width: 100%;">
+          </div>
+        </div>
+  </div>
+  <div id="customdialog" title="Contact Fields">
+      <div>
+          <ul id="custom-merge-fields-list" style="overflow:scroll; height:300px; margin-bottom: 0px; border-bottom: 1px solid #c5c5c5;"></ul>
+          <div style="width: 100%; padding: 5px;">
+             <input type="text" id="custom-field-search" placeholder="Search" style="width: 100%;">
+          </div>
+      </div>
+  </div>
+  </body>
+</html>

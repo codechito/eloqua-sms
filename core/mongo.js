@@ -23,12 +23,29 @@ const ConsumerModel = {
   "status": { type: String, default: 'enabled' }
 };
 
+const InstanceModel = {
+  "InstanceId": { type: String, required: true },
+  "InstallId": { type: String, required: true },
+  "CopiedInstanceId": { type: String, required: true},
+  "InstanceType": { type: String, required: true },
+  "CallbackUrl": { type: String, required: true },
+  "UserId": { type: String, required: true },
+  "DateCreated": { type: Date },
+  "DateConfigured": { type: Date },
+  "DateRemoved": { type: Date },
+  "DateNotified": { type: Date },
+  "status": { type: String, default: 'created' }
+}
+
 let connection = mongoose.createConnection(config.mongodburl,{useNewUrlParser: true});
 let ConsumerSchema = new Schema(ConsumerModel,{collection: 'Consumer',versionKey: false});
+let InstanceSchema = new Schema(InstanceModel,{collection: 'Instance',versionKey: false});
 let consumer = connection.model('Consumer',ConsumerSchema);
+let instance = connection.model('Instance',InstanceSchema);
 
 let db = {
-  Consumer: consumer
+  Consumer: consumer,
+  Instance: instance
 };
 
 module.exports = function(emitter){

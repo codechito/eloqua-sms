@@ -1,5 +1,5 @@
 {
-  "name": "eloquafy",
+  "name": "eloqua-sms",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -12,15 +12,27 @@
     "country-data": "0.0.31",
     "debug": "~2.6.9",
     "ejs": "~2.5.7",
+    "eloquafy": "0.3.0",
     "express": "~4.16.0",
     "express-session": "^1.15.1",
     "http-errors": "~1.6.2",
     "mongoose": "^5.3.11",
     "morgan": "~1.9.0",
     "psharky": "0.0.0",
-    "querystring": "^0.2.0",
     "request": "^2.88.0",
-    "slack-node": "^0.1.8",
-    "url": "^0.11.0"
-  }
+    "slack-node": "^0.1.8"
+  },
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codechito/eloqua-sms.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codechito/eloqua-sms/issues"
+  },
+  "homepage": "https://github.com/codechito/eloqua-sms#readme",
+  "description": ""
 }
