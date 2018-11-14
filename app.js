@@ -17,7 +17,9 @@ require('./core/mongo')(emitter);
 require('eloquafy')(emitter);
 
 let application = require('./routes/application')(emitter);
+let instance = require('./routes/instance')(emitter);
 
 app.use('/eloqua/lifecycle/', application);
+app.use('/eloqua/lifecycle/', instance);
 
 module.exports = app;
