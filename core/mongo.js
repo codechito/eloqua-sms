@@ -34,6 +34,16 @@ const InstanceModel = {
   "DateConfigured": { type: Date },
   "DateRemoved": { type: Date },
   "DateNotified": { type: Date },
+  "message": { type: String },
+  "caller_id": { type: String },
+  "recipient_field": { type: String },
+  "country_field": { type: String },
+  "country_setting": { type: String },
+  "custom_object_id": { type: String },
+  "notification_field": { type: String },
+  "mobile_field": { type: String },
+  "email_field": { type: String },
+  "title_field": { type: String },
   "status": { type: String, default: 'created' }
 }
 

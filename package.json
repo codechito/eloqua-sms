@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "async": "^2.1.5",
     "config": "^2.0.1",
     "connect-mongo": "2.0.1",
     "cookie-parser": "~1.4.3",
@@ -20,7 +21,8 @@
     "morgan": "~1.9.0",
     "psharky": "0.0.0",
     "request": "^2.88.0",
-    "slack-node": "^0.1.8"
+    "slack-node": "^0.1.8",
+    "http-errors": "~1.6.2"
   },
   "main": "app.js",
   "devDependencies": {},

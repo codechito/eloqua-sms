@@ -8,7 +8,7 @@ module.exports = function(emitter){
   
   const mdlware = require('./middleware')(emitter);
   
-  router.post('/enable', function(req, res){
+  router.post('/enable', function(req, res, next){
     
     let redirect_uri = config.serverurl + '/eloqua/lifecycle/callback/' + req.query.InstallId;
     let enable_uri_option = {
@@ -38,15 +38,25 @@ module.exports = function(emitter){
       upsert.then(function(upsert_res){
         res.redirect(enable_app_res[0]);    
       },function(err){
-        res.status(400).json(err);
+        let error = {
+          code: "E-0001",
+          message: "Something went wrong while inserting client info",
+          details: err
+        };
+        next(error);
       });
     },function(err){
-      res.status(400).json(err);
+      let error = {
+        code: "E-0002",
+        message: "Something went wrong while installing the application",
+        details: err
+      };
+      next(error);
     });
     
   });
 
-  router.get('/callback/:InstallId', function(req, res){
+  router.get('/callback/:InstallId', function(req, res, next){
     
     if(req.query.code && req.params.InstallId){
       let redirect_uri = config.serverurl + '/eloqua/lifecycle/callback/' + req.params.InstallId;
@@ -77,19 +87,34 @@ module.exports = function(emitter){
         upsert.then(function(upsert_res){
           res.redirect(upsert_res[0].CallbackUrl);
         },function(err){
-          res.status(400).json(err);
+          let error = {
+            code: "E-0003",
+            message: "Something went wrong while updating the client info",
+            details: err
+          };
+          next(error);
         });
       },function(err){
-        res.status(400).json(err);
+        let error = {
+          code: "E-0004",
+          message: "Something went wrong while confirming the installation of the application",
+          details: err
+        };
+        next(error);
       });
     }
     else{
-      res.status(400).json("Missing one of these required parameters: code, InstallId");
+      let error = {
+        code: "E-0005",
+        message: "Something went wrong while confirming the installation of the application",
+        details: "Missing one of these required parameters: code, InstallId"
+      };
+      next(error);
     }
     
   });
   
-  router.all('/configure/:InstallId', mdlware.verify, function(req, res){
+  router.all('/configure/:InstallId', mdlware.verify, function(req, res, next){
     
     let consumer = emitter.invokeHook('db::findOne', { table:'Consumer', condition: { InstallId: req.params.InstallId }});        
     consumer.then(function(consumer_res){
@@ -110,7 +135,12 @@ module.exports = function(emitter){
           upsert_res[0].countries = countries;
           res.render('application',upsert_res[0]);
         },function(err){
-          res.status(400).json(err);
+          let error = {
+            code: "E-0006",
+            message: "Something went wrong while updating the client info",
+            details: err
+          };
+          next(error);
         });
       }
       else{
@@ -118,12 +148,17 @@ module.exports = function(emitter){
         res.render('application',consumer_res[0]);
       }     
     },function(err){
-        res.status(400).json(err);
+        let error = {
+          code: "E-0007",
+          message: "Something went wrong while configuring the application",
+          details: err
+        };
+        next(error);
     });   
     
   });
   
-  router.post('/disable/:InstallId', mdlware.verify, function(req, res){ 
+  router.post('/disable/:InstallId', mdlware.verify, function(req, res, next){ 
     
     let queryOption = {
       table: 'Consumer',
@@ -137,8 +172,12 @@ module.exports = function(emitter){
     upsert.then(function(upsert_res){
       res.status(200).send('application uninstalled successfully');
     },function(err){
-      console.log(err);
-      res.status(400).json(err);
+      let error = {
+        code: "E-0008",
+        message: "Something went wrong while updating the client info",
+        details: err
+      };
+      next(error);
     });
 
   });

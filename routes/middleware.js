@@ -4,6 +4,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const Slack = require('slack-node');
 const config = require('config');
+const createError = require('http-errors');
 
 let slack = new Slack();
 slack.setWebhook(config.slack_webhook);
@@ -12,6 +13,7 @@ module.exports = function(emitter){
 
   return {
     verify: function(req, res, next){   
+      console.log(req.method,req.originalUrl);
       let verify_options = {
         "originalUrl": config.serverurl + req.originalUrl,           	                        
         "method" : req.method,
@@ -24,10 +26,22 @@ module.exports = function(emitter){
           next();
         }
         else{
-          res.status(400).json("Oauth Verification failed");
+          let error = {
+            code: "E-0023",
+            message: "Something went wrong while verifying the request",
+            details: "Oauth Verification failed"
+          };
+          res._error = error;
+          res.status(400).json(error);
         }
       },function(err){
-        res.status(400).json(err);
+        let error = {
+          code: "E-0023",
+          message: "Something went wrong while verifying the request",
+          details: err
+        };
+        res._error = error;
+        res.status(400).json(error);
       });
     },
     notify: function(req, res, next){   
@@ -57,6 +71,12 @@ module.exports = function(emitter){
       else{
         next();
       }
+    },    
+    oversight: function(req, res, next){
+      next(createError(400));
+    },
+    catch: function(err,req, res, next){
+        res.status(400).render('error',err);
     }
   }
 };
