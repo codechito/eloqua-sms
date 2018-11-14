@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Configure Decision Service</title>
+
+    <link href="/assets/stylesheets/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/stylesheets/jquery-ui.css">
+    <link href="/assets/stylesheets/main.css" rel="stylesheet">
+    <style type="text/css">
+      #merge-fields-list li:hover {background-color: #bdf;}
+      .form-group span {
+        text-align: left;
+        display: block;
+        font-size: 12px;
+        font-style: italic;
+        margin-top: 10px;
+      }
+      .ui-widget {
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+          font-size: 12px;
+          padding: 0px;
+        }
+        .ui-widget #dialog {
+          padding: 10px 0px;
+        }
+        .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+          font-size: 12px;
+        }
+        .ui-dialog .ui-dialog-titlebar-close {
+          background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANBJREFUeNpiYKAQMMMYrq6uCcrKyv1AfPHevXsvsCkGqjEAyi8HYkagmgsgMUaYZiA1H6ruAxA77t69+wK6ZiC1H4gFoEKJQDULmKCceCS1IAX7oRpwaYbrYYFyCtEUwAxxhPLRNX+A6oF4AY8tH5AMZMDmRUYC/kQHGOHDiC2kcRiCNXCZKE0H1PMCRYGIRzO+aAQbAguDflwKoDY5IrkG5qJ+5EBciM+fOAxZCM9MoIwBzCAPoSZHokcVVM0LoJqdQKYGEDeC8gEDNQBAgAEARFVtDaumXRoAAAAASUVORK5CYII=");
+          background-color: transparent;
+          border: 0px;
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+        button.ui-dialog-titlebar-close:focus {
+          outline: none;
+        }
+    </style>
+  </head>
+  <body>
+  <div class="disabler"></div>
+  <div class="container" style="width: 600px;">
+  <center>
+      <form method = "post" id="decision">
+        <br/>
+        <br/>
+        <br/>
+        <h4 style="font-size: 20px; font-weight: bold; text-align: center;">
+          <img src="/assets/images/received-sms-el-icon.png">&nbsp;Check for Received SMS
+        </h4>
+        <br/>
+        <% if (locals.status && locals.status.success) { %>
+            <div class="alert alert-success alert-dismissible fade in" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <%= locals.status.success %>
+            </div>
+        <% } %>
+        <% if (locals.status && locals.status.error) { %>
+          <div class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <%= locals.status.error %>
+          </div>
+        <% } %>
+        <div class="row">
+          <div class="col-md-6" style="display: inline-block;width: 280px;vertical-align: top;margin-left: -10px;">
+              <div class="form-group">
+                  <label for="evaluation_period" style="float: left;">How long should we wait?</label>
+                  <select style="width: 275px;" name = "evaluation_period" id = "evaluation_period" class="form-control">
+                      <% for(var i = 1; i <= 24; i++) { %>
+                      <option value = "<%= i %>" <% if(locals.evaluation_period == i){ %> selected="selected" <% } %> >
+                        <%= i %> HR<% if( i != 1 ){ %>S<% }%>
+                      </option>
+                    <% } %>
+                    <option value = "-1" <% if(locals.evaluation_period == -1){ %> selected="selected" <% } %> >
+                      Always
+                    </option>
+                  </select>
+              </div>
+          </div>
+          <div class="col-md-6" style="width: 280px;float: right;margin-right: -15px;">
+              <div class="form-group">
+                  <label for="text_type" style="float: left;">What type of text are we looking for?</label>
+                  <select name = "text_type" id = "text_type" class="form-control">
+                      <option value = "Anything" <% if(locals.text_type == "Anything"){ %> selected="selected" <% } %> >Anything</option>
+                      <option value = "Keyword" <% if(locals.text_type == "Keyword"){ %> selected="selected" <% } %> >Keyword</option>
+                  </select>
+              </div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="display: inline-block;width: 280px;vertical-align: top;margin-left: -10px; text-align:left">
+                <div class="form-group">
+                    <label for="message" >Custom Objects</label><br>
+                    <select name = "custom_object_id" id = "custom_object_id" style="width: 275px;height: 34px;" >
+                         <% if (locals.custom_objects && locals.custom_objects.elements && locals.custom_objects.elements.length){ %>
+                          <option value = "" >None</option>
+                          <% for(var i=0; i < locals.custom_objects.elements.length; i++) { %>
+                              <option value = "<%= locals.custom_objects.elements[i].id %>" <% if(locals.custom_object_id == locals.custom_objects.elements[i].id ){ %> selected="selected" <% } %> >
+                              <%= locals.custom_objects.elements[i].name %>
+                          </option>
+                          <% } %>
+                      <% } %>
+                   </select>
+                 </div>
+            </div>
+            <div class="col-md-6" style="width: 280px;float: right;margin-right: -15px;">
+                <div class="form-group">
+                    <label for="keyword" style="float: left;">Keyword</label>
+                  <input type = "text" name="keyword" id= "keyword" value="<%= locals.keyword %>" class="form-control"/>
+              </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="display: inline-block;width: 280px;vertical-align: top;margin-left: 15px;text-align:left;">
+                <div class="form-group">
+                    <label for="message" style="margin-left: -15px;">Map Contact Mobile To</label><br/>
+                    <input type="text" class="form-control" style="width:200px;display: inline;margin-left: -20px;" id="mobile_field" name="mobile_field" value="<%= locals.mobile_field %>"/>
+                    <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;"id="mobileFieldList">Choose</button><br/>
+                </div>
+             </div>
+            <div class="col-md-6" style="width: 280px;float: right;margin-right: -30px; text-align:left;">
+                <div class="form-group">
+                    <label for="message" style="margin-left: -15px;">Map Contact Email To</label><br/>
+                    <input type="text" class="form-control" style="width:200px;display: inline;margin-left: -20px;" id="email_field" name="email_field" value="<%= locals.email_field %>"/>
+                    <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;" id="emailFieldList">Choose</button><br/>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="display: inline-block;width: 280px;vertical-align: top;margin-left: 15px; text-align:left; ">
+              <div class="form-group">
+                  <label for="message" style="margin-left: -15px;" >Map Contact Reply To</label><br/>
+                  <input type="text" class="form-control" style="width:200px;display: inline;margin-left: -20px;" id="response_field" name="response_field" value="<%= locals.response_field %>"/>
+                  <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;" id="responseFieldList">Choose</button><br/>
+              </div>
+            </div>
+            <div class="col-md-6" style="width: 280px;float: right;margin-right: -30px; text-align:left;">
+                <div class="form-group">
+                    <label for="message" style="margin-left: -15px;">Map Campaign Title To</label><br/>
+                    <input type="text" class="form-control" style="width:200px;display: inline;margin-left: -20px;" id="title_field" name="title_field" value="<%= locals.title_field %>"/>
+                    <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;" id="titleFieldList">Choose</button><br/>
+                </div>
+            </div>
+        </div>
+        <button id="btnSave" type="submit" class="btn btn-default" >Update</button>
+      </form>
+      </center>
+    </div>
+    <script src="/assets/javascripts/jquery.js"></script>
+    <script src="/assets/javascripts/jquery-ui.js"></script>
+    <script src="/assets/javascripts/autosize.min.js"></script>
+    <script type="text/javascript" src="/assets/javascripts/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+
+        var customdialog = $( "#customdialog" ).dialog({
+          autoOpen: false,
+          height: 400,
+          width: 240,
+          modal: false
+        });
+
+        $('#btnSave').click(function() {
+          $('body').addClass('loading');
+        });
+
+        $("#text_type").change(function(){
+          if($(this).val() == "Keyword"){
+            $("#keyword").parent().show();
+          }
+          else{
+            $("#keyword").parent().hide();
+          }
+        });
+        
+        
+        $("#text_type").change();
+
+        var reloadObjectField = function(id){
+        if(id){
+          var request = $.ajax({
+            url: "/eloqua/action/ajax/customobject/" + "<%= locals.installId %>" + "/" + "<%= locals.SiteId %>" + "/" + id,
+            method: "GET"
+          });
+          
+          request.done(function( objectFields ) {
+            $("#custom-merge-fields-list").find('li')
+            .empty();
+            for(var i in objectFields.fields ) {
+              $("#custom-merge-fields-list").append(
+              '<li data-name="' + objectFields.fields[i].name + '" ' + 
+                    'data-dataType="' + objectFields.fields[i].dataType + '" ' + 
+                    'data-internalName="' + objectFields.fields[i].internalName + '" ' +
+                    'data-id="' + objectFields.fields[i].id + '" ' +
+                    'style="display: block; cursor: pointer;">' +
+                    objectFields.fields[i].internalName + '</li>'
+              );
+            }
+            
+            return false;
+          });
+          
+          request.fail(function( jqXHR, textStatus ) {
+            console.log(textStatus);
+          });
+        }
+
+      };
+
+      
+      $("#custom_object_id").change(function(){
+        if($(this).val()){
+          reloadObjectField($(this).val());
+          $("#mobile_field").parent().show();
+          $("#email_field").parent().show();
+          $("#response_field").parent().show();
+          $("#title_field").parent().show();
+        }
+        else{
+          $("#mobile_field").parent().hide();
+          $("#email_field").parent().hide();
+          $("#response_field").parent().hide();
+          $("#title_field").parent().hide();
+        }
+
+      });
+
+      $("#custom_object_id").change();
+
+      $( "#responseFieldList" ).button().on( "click", function() {
+        if($("#custom_object_id").val()){
+          clickSrc = "#response_field";
+          customdialog.dialog( "open" );
+        }
+        else{
+          alert("No custom object id selected, Note : this is not a required field.");
+        }
+        
+      });
+
+      $( "#titleFieldList" ).button().on( "click", function() {
+        if($("#custom_object_id").val()){
+          clickSrc = "#title_field";
+          customdialog.dialog( "open" );
+        }
+        else{
+          alert("No custom object id selected");
+        }
+        
+      });
+
+
+      $( "#mobileFieldList" ).button().on( "click", function() {
+        if($("#custom_object_id").val()){
+          clickSrc = "#mobile_field";
+          customdialog.dialog( "open" );
+        }
+        else{
+          alert("No custom object id selected");
+        }
+        
+      });
+
+      $( "#emailFieldList" ).button().on( "click", function() {
+        if($("#custom_object_id").val()){
+          clickSrc = "#email_field";
+          customdialog.dialog( "open" );
+        }
+        else{
+          alert("No custom object id selected");
+        }
+        
+      });
+
+      $("#custom-field-search").on("keyup click input", function () {
+        if (this.value.length > 0) {
+          $("#custom-merge-fields-list li").hide().filter(function () {
+            return $(this).text().toLowerCase().indexOf($("#custom-field-search").val().toLowerCase()) != -1;
+          }).show();
+        }
+        else {
+          $("#custom-merge-fields-list li").show();
+        }
+      });
+
+      $('#custom-merge-fields-list').delegate('li', 'click', function (e) {
+          var item = $(this);
+          var srcField = $(clickSrc);
+          srcField.val(item.attr("data-internalName").replace("C_",""));
+          customdialog.dialog( "close" );
+          
+      });
+
+
+      });
+    </script>
+  </div>
+
+  <div id="customdialog" title="Contact Fields">
+      <div>
+          <ul id="custom-merge-fields-list" style="overflow:scroll; height:300px; margin-bottom: 0px; border-bottom: 1px solid #c5c5c5;"></ul>
+          <div style="width: 100%; padding: 5px;">
+             <input type="text" id="custom-field-search" placeholder="Search" style="width: 100%;">
+          </div>
+      </div>
+  </div>
+
+  </body>
+</html>

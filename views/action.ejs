@@ -44,21 +44,13 @@
           <img src="/assets/images/send-sms-el-icon.png">&nbsp;Create your Text Message
         </h4>
         <br/>
-        <% if (status && status.success) { %>
+        <% if (locals.message) { %>
             <div class="alert alert-success alert-dismissible fade in" role="alert">
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
-              <%= status.success %>
+              <%= locals.message %>
             </div>
-        <% } %>
-        <% if (status && status.error) { %>
-          <div class="alert alert-danger alert-dismissible fade in" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <%= status.error %>
-          </div>
         <% } %>
       <div class="container-fluid">
       <div class="row">
@@ -67,6 +59,7 @@
                       <label for="message" >Sender ID</label><br>
                       <select name = "caller_id" id = "caller_id" style="width: 200px; height: 35px;" class="form-control">
                          <option value = "" >Default</option>
+                        <%  if(locals.sender_ids){ %>
                          <% for(var i=0; i < locals.sender_ids["Virtual Number"].length; i++) { %>
                             <option value = "<%= locals.sender_ids["Virtual Number"][i] %>" <% if(locals.caller_id == locals.sender_ids["Virtual Number"][i]){ %> selected="selected" <% } %> >
                             <%= locals.sender_ids["Virtual Number"][i] %>
@@ -77,13 +70,14 @@
                            <%= locals.sender_ids["Business Name"][i] %>
                         </option>
                         <% } %>
+                        <% } %>
                      </select>
                    </div>
                </div>
               <div class="col-md-6" style="width: 240px;float: right;margin-right: -15px;">
                     <div class="form-group">
                       <label for="message" >Recipient Field</label><br/>
-                      <input type="text" class="form-control" style="width:140px; display:inline;" id="recipient_field" name="recipient_field" value="<%= locals.recipient_field %>"/>
+                      <input type="text" class="form-control" style="width:140px; display:inline;" id="recipient_field" name="recipient_field" value="<%= locals.instance.recipient_field %>"/>
                       <button type="button" class="btn btn-default" style="float: right; font-size: 12px; height:35px;"id="recipientFieldList">Choose</button><br/>
                    </div>
               </div>
@@ -93,15 +87,15 @@
           <div class="form-group">
               <label for="message" >AutoFormat Mobile Number</label><br>
               <select name = "country_setting" id = "country_setting" style="width: 200px; height: 35px;" class="form-control">
-                 <option value = "cc" <% if(locals.country_setting == "cc" ){ %> selected="selected" <% } %> >Contact Country </option>
-                 <option value = "cf" <% if(locals.country_setting == "cf" ){ %> selected="selected" <% } %> >Custom Field </option>
+                 <option value = "cc" <% if(locals.instance.country_setting == "cc" ){ %> selected="selected" <% } %> >Contact Country </option>
+                 <option value = "cf" <% if(locals.instance.country_setting == "cf" ){ %> selected="selected" <% } %> >Custom Field </option>
              </select>
            </div>
        </div>
       <div class="col-md-6" style="width: 240px;float: right;margin-right: -15px;">
             <div class="form-group">
               <label for="message" >Country Field</label><br/>
-              <input type="text" class="form-control" style="width:140px; display:inline;" id="country_field" name="country_field" value="<%= locals.country_field %>"/>
+              <input type="text" class="form-control" style="width:140px; display:inline;" id="country_field" name="country_field" value="<%= locals.instance.country_field %>"/>
               <button type="button" class="btn btn-default" style="float: right; font-size: 12px; height:35px;"id="countryFieldList">Choose</button><br/>
            </div>
       </div>
@@ -114,7 +108,7 @@
                      <% if (locals.custom_objects && locals.custom_objects.elements && locals.custom_objects.elements.length){ %>
                       <option value = "" >None</option>
                       <% for(var i=0; i < locals.custom_objects.elements.length; i++) { %>
-                          <option value = "<%= locals.custom_objects.elements[i].id %>" <% if(locals.custom_object_id == locals.custom_objects.elements[i].id ){ %> selected="selected" <% } %> >
+                          <option value = "<%= locals.custom_objects.elements[i].id %>" <% if(locals.instance.custom_object_id == locals.custom_objects.elements[i].id ){ %> selected="selected" <% } %> >
                           <%= locals.custom_objects.elements[i].name %>
                       </option>
                       <% } %>
@@ -125,7 +119,7 @@
 	      <div class="col-md-6" style="width: 240px;float: right;margin-right: -15px;">      
             <div class="form-group">
                 <label for="message" >Map Notification To</label><br/>
-                <input type="text"  style="width:140px; display:inline;" class="form-control" id="notification_field" name="notification_field" value="<%= locals.notification_field %>"/>
+                <input type="text"  style="width:140px; display:inline;" class="form-control" id="notification_field" name="notification_field" value="<%= locals.instance.notification_field %>"/>
                 <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;"id="notificationFieldList">Choose</button><br/>
             </div>
 	      </div>
@@ -134,14 +128,14 @@
 		    <div class="col-md-6" style="display: inline-block;width: 240px;vertical-align: top;margin-left: -10px;">
             <div class="form-group">
                 <label for="message" >Map Contact Mobile To </label><br/>
-                <input type="text"  style="width:140px; display:inline;" class="form-control" id="mobile_field" name="mobile_field" value="<%= locals.mobile_field %>"/>
+                <input type="text"  style="width:140px; display:inline;" class="form-control" id="mobile_field" name="mobile_field" value="<%= locals.instance.mobile_field %>"/>
                 <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;"id="mobileFieldList">Choose</button><br/>
             </div>
 	  	   </div>
 	      <div class="col-md-6" style="width: 240px;float: right;margin-right: -15px;">
             <div class="form-group">
                 <label for="message" >Map Contact Email To </label><br/>
-                <input type="text"  style="width:140px; display:inline;" class="form-control" id="email_field" name="email_field" value="<%= locals.email_field %>"/>
+                <input type="text"  style="width:140px; display:inline;" class="form-control" id="email_field" name="email_field" value="<%= locals.instance.email_field %>"/>
                 <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;"id="emailFieldList">Choose</button><br/>
             </div>
         </div>
@@ -150,7 +144,7 @@
 		    <div class="col-md-6" style="display: inline-block;width: 240px;vertical-align: top;margin-left: -10px;">
             <div class="form-group">
                 <label for="message" >Map Campaign Title To </label><br/>
-                <input type="text"  style="width:140px; display:inline;" class="form-control" id="title_field" name="title_field" value="<%= locals.title_field %>"/>
+                <input type="text"  style="width:140px; display:inline;" class="form-control" id="title_field" name="title_field" value="<%= locals.instance.title_field %>"/>
                 <button type="button" class="btn btn-default" style="float: right; font-size: 11px; height:35px;"id="titleFieldList">Choose</button><br/>
             </div>
 	  	   </div>
@@ -161,7 +155,7 @@
         <div class="form-group">
             <label for="message" >Message</label>
             <button type="button" class="btn btn-default" style="float: right; margin-bottom: 10px; font-size: 11px;"id="fieldMerger">Merge</button>
-            <textarea style="height: 200px;" class="form-control" name = "message" id = "message"><%= locals.message %></textarea>
+            <textarea style="height: 200px;" class="form-control" name = "message" id = "message"><%= locals.instance.message %></textarea>
         </div>
         <button id="btnSave" type="submit" class="btn btn-default" style="margin: 0 auto; display: block;">SAVE</button>
         <br/><br/>
@@ -171,6 +165,207 @@
     <script src="/assets/javascripts/jquery-ui.js"></script>
     <script src="/assets/javascripts/autosize.min.js"></script>
     <script src="/assets/javascripts/bootstrap.min.js"></script>
+        <script type="text/javascript">
+    
+    $(document).ready(function () {
+
+
+      var reloadObjectField = function(id){
+        if(id){
+          var request = $.ajax({
+            url: "/eloqua/customobject/" + "<%= locals.consumer.InstallId %>" + "/" + id,
+            method: "GET"
+          });
+          
+          request.done(function( objectFields ) {
+            $("#custom-merge-fields-list").find('li')
+            .empty();
+            for(var i in objectFields.fields ) {
+              $("#custom-merge-fields-list").append(
+              '<li data-name="' + objectFields.fields[i].name + '" ' + 
+                    'data-dataType="' + objectFields.fields[i].dataType + '" ' + 
+                    'data-internalName="' + objectFields.fields[i].internalName + '" ' +
+                    'data-id="' + objectFields.fields[i].id + '" ' +
+                    'style="display: block; cursor: pointer;">' +
+                    objectFields.fields[i].internalName + '</li>'
+              );
+            }
+            
+            return false;
+          });
+          
+          request.fail(function( jqXHR, textStatus ) {
+            console.log(textStatus);
+          });
+        }
+
+      };
+
+      
+      $("#custom_object_id").change(function(){
+        if($(this).val()){
+          reloadObjectField($(this).val());
+          $("#mobile_field").parent().show();
+          $("#email_field").parent().show();
+          $("#notification_field").parent().show();
+          $("#title_field").parent().show();
+        }
+        else{
+          $("#mobile_field").parent().hide();
+          $("#email_field").parent().hide();
+          $("#notification_field").parent().hide();
+          $("#title_field").parent().hide();
+        }
+
+      });
+
+      $("#custom_object_id").change();
+      
+      $('#btnSave').click(function() {
+        $('body').addClass('loading');
+      });
+
+      var dialog = $( "#dialog" ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 240,
+        modal: false
+      });
+
+      var customdialog = $( "#customdialog" ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 240,
+        modal: false
+      });
+      
+      var clickSrc = null;
+
+
+      $("#country_setting").change(function(){
+        if($(this).val() == "cf"){
+          $("#country_field").parent().show();
+        }
+        else{
+          $("#country_field").parent().hide();
+        }
+      });
+      $("#country_setting").change();
+
+      $( "#fieldMerger" ).button().on( "click", function() {
+        clickSrc = "#message";
+        dialog.dialog( "open" );
+      });
+
+      $( "#titleFieldList" ).button().on( "click", function() {
+        if($("#custom_object_id").val()){
+          clickSrc = "#title_field";
+          customdialog.dialog( "open" );
+        }
+        else{
+          alert("No custom object id selected");
+        }
+        
+      });
+      
+      $( "#recipientFieldList" ).button().on( "click", function() {
+    	  clickSrc = "#recipient_field";
+        dialog.dialog( "open" );
+      });
+
+      $( "#countryFieldList" ).button().on( "click", function() {
+    	  clickSrc = "#country_field";
+        dialog.dialog( "open" );
+      });
+
+
+      $( "#mobileFieldList" ).button().on( "click", function() {
+        if($("#custom_object_id").val()){
+          clickSrc = "#mobile_field";
+          customdialog.dialog( "open" );
+        }
+        else{
+          alert("No custom object id selected");
+        }
+        
+      });
+
+      $( "#emailFieldList" ).button().on( "click", function() {
+        if($("#custom_object_id").val()){
+          clickSrc = "#email_field";
+          customdialog.dialog( "open" );
+        }
+        else{
+          alert("No custom object id selected");
+        }
+        
+      });
+
+      
+       
+      $( "#notificationFieldList" ).button().on( "click", function() {
+        if($("#custom_object_id").val()){
+          customdialog.dialog( "open" );
+          clickSrc = "#notification_field";
+        }
+        else{
+          alert("No custom object id selected");
+        }
+        
+      });
+
+      $("#merge-fields-list li").show();
+
+      $("#field-search").on("keyup click input", function () {
+        if (this.value.length > 0) {
+          $("#merge-fields-list li").hide().filter(function () {
+            return $(this).text().toLowerCase().indexOf($("#field-search").val().toLowerCase()) != -1;
+          }).show();
+        }
+        else {
+          $("#merge-fields-list li").show();
+        }
+      });
+
+      $("#custom-field-search").on("keyup click input", function () {
+        if (this.value.length > 0) {
+          $("#custom-merge-fields-list li").hide().filter(function () {
+            return $(this).text().toLowerCase().indexOf($("#custom-field-search").val().toLowerCase()) != -1;
+          }).show();
+        }
+        else {
+          $("#custom-merge-fields-list li").show();
+        }
+      });
+
+      $("#merge-fields-list li").click(function(e){ 
+    	  
+          var item = $(this);
+          var srcField = $(clickSrc);
+          if(clickSrc == "#recipient_field"){
+            srcField.val(item.attr("data-internalName").replace("C_",""));
+            dialog.dialog( "close" );
+          }
+          if(clickSrc == "#country_field"){
+            srcField.val(item.attr("data-internalName").replace("C_",""));
+            dialog.dialog( "close" );
+          }
+          if(clickSrc == "#message"){
+            srcField.val(srcField.val() + "[" + item.attr("data-internalName") + "]\n");
+          }
+          
+      });
+      $('#custom-merge-fields-list').delegate('li', 'click', function (e) {
+          var item = $(this);
+          var srcField = $(clickSrc);
+          srcField.val(item.attr("data-internalName").replace("C_",""));
+          customdialog.dialog( "close" );
+          
+          
+      });
+
+    });
+    </script>
   </div>
 
   <div id="dialog" title="Contact Fields">

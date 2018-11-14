@@ -8,9 +8,16 @@ body.loading .disabler {
 	opacity: 0.8;
 }
 
-.alert {
+.alert-danger {
 	padding: 5px 35px 5px;
 	text-align: center;
+  font-size: 20px; 
+}
+
+.alert-warning {
+	padding: 5px 15px 5px;
+	text-align: center;
+  font-size: 15px; 
 }
 
 .center-block {
@@ -18,7 +25,7 @@ body.loading .disabler {
 }
 
 h4.title {
-	font-size: 20px; 
+	font-size: 40px; 
 	font-weight: bold; 
 	text-align: center;
 }
